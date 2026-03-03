@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Cadeia Alimentar — Apresentação (HTML)</title>
+
+<style>
+  :root{
+    --bg1:#070A12; --bg2:#0B1430;
+    --txt:#eaf0ff; --muted:#b8c3e6;
+    --accent:#7C5CFF; --accent2:#2EE6A6;
+    --warn:#FFCC66; --danger:#FF5C8A;
+    --shadow: 0 18px 70px rgba(0,0,0,.55);
+    --radius: 18px; --radius2: 26px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--txt);
+    background:
+      radial-gradient(1200px 700px at 20% 15%, rgba(124,92,255,.22), transparent 60%),
+      radial-gradient(900px 600px at 80% 20%, rgba(46,230,166,.16), transparent 55%),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
+    overflow:hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height:100dvh;
+  }
+
+  /* HEADER */
+  .hud{
+    position:fixed; inset:0 0 auto 0;
+    height:72px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px;
+    background: linear-gradient(180deg, rgba(5,7,19,.88), rgba(5,7,19,.25));
+    border-bottom:1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(10px);
+    z-index:60;
+  }
+  .brand{display:flex; gap:12px; align-items:center; min-width: 290px;}
+  .logo{
+    width:40px; height:40px; border-radius:14px;
+    background: linear-gradient(135deg, rgba(124,92,255,1), rgba(46,230,166,1));
+    box-shadow: 0 12px 30px rgba(124,92,255,.18);
+    position:relative; overflow:hidden;
+  }
+  .logo:before{
+    content:""; position:absolute; inset:-40% -40%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.65), transparent 55%);
+    animation: shimmer 3.2s ease-in-out infinite;
+  }
+  @keyframes shimmer{
+    0%,100%{ transform: translate3d(-12px,-8px,0) rotate(10deg); opacity:.55 }
+    50%{ transform: translate3d(14px,10px,0) rotate(-10deg); opacity:.85 }
+  }
+  .brand h1{font-size:14px; margin:0; letter-spacing:.2px; line-height:1.05;}
+  .brand .sub{color:var(--muted); font-size:12px; margin-top:2px;}
+
+  .controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .btn{
+    appearance:none;
+    border:none;
+    color:var(--txt);
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    padding:10px 12px;
+    border-radius: 14px;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    display:flex; gap:10px; align-items:center;
+    font-weight:850;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
+  .btn:active{ transform: translateY(0px) scale(.99); }
+  .btn.primary{
+    background: linear-gradient(135deg, rgba(124,92,255,1), rgba(46,230,166,1));
+    border-color: transparent;
+  }
+
+  .pill{
+    padding:8px 10px;
+    font-size:12px;
+    border-radius:999px;
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    display:flex; align-items:center; gap:8px;
+    user-select:none;
+    font-weight:900;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--accent2);
+    box-shadow: 0 0 0 6px rgba(46,230,166,.12);
+  }
+
+  /* PROGRESS */
+  .progressWrap{
+    position:fixed; left:0; right:0; top:72px; height:4px;
+    z-index:59; background: rgba(255,255,255,.06);
+  }
+  .progress{
+    height:100%; width:0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow: 0 12px 30px rgba(124,92,255,.24);
+    transition: width .35s ease;
+  }
+
+  /* STAGE / DECK */
+  .stage{
+    position:fixed;
+    inset: 76px 0 0 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 22px;
+    touch-action: pan-y;
+    overflow:hidden;
+  }
+  .deck{
+    width:min(1220px, 100%);
+    height:min(740px, calc(100dvh - 114px));
+    border-radius: var(--radius2);
+    position:relative;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+    background:
+      radial-gradient(900px 600px at 20% 15%, rgba(124,92,255,.12), transparent 60%),
+      radial-gradient(700px 520px at 80% 20%, rgba(46,230,166,.10), transparent 55%),
+      linear-gradient(180deg, rgba(10,16,40,.96), rgba(8,12,30,.96));
+    border: 1px solid rgba(255,255,255,.10);
+  }
+
+  .viewport{
+    position:absolute; inset:0;
+    perspective:1100px;
+    perspective-origin: 50% 45%;
+    overflow:hidden;
+  }
+  .slides3d{ position:absolute; inset:0; transform-style: preserve-3d; }
+
+  .slide{
+    position:absolute; inset:0;
+    padding: 34px 34px 26px 34px;
+    display:grid;
+    grid-template-columns: 1.25fr .75fr;
+    gap: 18px;
+    border-radius: var(--radius2);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+
+    opacity:0;
+    pointer-events:none;
+    transform: translate3d(0,0,-220px) rotateY(45deg) scale(.99);
+    transition: transform .65s cubic-bezier(.2,.85,.2,1), opacity .45s ease;
+  }
+  .slide.single{ grid-template-columns: 1fr; }
+  .slide.active{ opacity:1; pointer-events:auto; transform: translate3d(0,0,0) rotateY(0deg) scale(1); }
+  .slide.prev{ opacity:.18; transform: translate3d(-70px,0,-260px) rotateY(-45deg) scale(.985); }
+  .slide.next{ opacity:.18; transform: translate3d(70px,0,-260px) rotateY(45deg) scale(.985); }
+
+  .title{ margin:0; font-size: 36px; letter-spacing: .2px; line-height: 1.05; }
+  .kicker{ color: var(--muted); margin-top: 10px; font-size: 15px; line-height: 1.5; max-width: 78ch; }
+
+  .panel{
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  }
+  .panel h3{
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    letter-spacing: .4px;
+    color: rgba(234,240,255,.95);
+    text-transform: uppercase;
+  }
+  .list{ margin:0; padding-left: 18px; color: rgba(234,240,255,.92); line-height: 1.55; }
+  .list li{ margin: 7px 0; }
+
+  .callouts{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 12px; }
+  .tag{
+    display:inline-flex; gap:8px; align-items:center;
+    padding:10px 12px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    font-weight: 950;
+    font-size: 13px;
+    user-select:none;
+  }
+  .tag b{ color: var(--txt); }
+
+  .cards{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .card{
+    position:relative;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 18px;
+    padding: 14px;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    overflow:hidden;
+  }
+  .card:hover{ transform: translateY(-2px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.16); }
+  .card .small{ color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.35; }
+
+  .badge{
+    position:absolute; top: 10px; right: 10px;
+    font-size: 12px; padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+    font-weight: 950;
+  }
+
+  .sceneWrap{display:flex; flex-direction:column; gap:12px; height:100%;}
+  .scene{
+    position:relative;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,.10);
+    background:
+      radial-gradient(600px 380px at 20% 15%, rgba(255,204,102,.20), transparent 60%),
+      radial-gradient(700px 520px at 70% 25%, rgba(124,92,255,.16), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    overflow:hidden;
+    height: 470px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  }
+
+  .hotspot{
+    position:absolute;
+    width: 50px; height: 50px;
+    border-radius: 16px;
+    display:grid; place-items:center;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(10,16,40,.50);
+    backdrop-filter: blur(8px);
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease;
+    user-select:none;
+    font-size: 20px;
+  }
+  .hotspot:hover{ transform: translateY(-2px) scale(1.02); background: rgba(10,16,40,.66); }
+  .hsLabel{
+    position:absolute;
+    left: 56px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: rgba(234,240,255,.95);
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space:nowrap;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .15s ease;
+    font-weight:950;
+  }
+  .hotspot:hover .hsLabel{ opacity:1; }
+
+  .particles{ position:absolute; inset:0; pointer-events:none; }
+  .p{
+    position:absolute;
+    width:8px; height:8px; border-radius:50%;
+    background: linear-gradient(135deg, rgba(255,204,102,1), rgba(46,230,166,1));
+    opacity:.95;
+    animation: fly 3.8s linear infinite;
+  }
+  @keyframes fly{
+    0%{ transform: translate3d(0,0,0) scale(.9); opacity: 0; }
+    10%{ opacity: .95; }
+    85%{ opacity:.9; }
+    100%{ transform: translate3d(var(--dx), var(--dy), 0) scale(.6); opacity: 0; }
+  }
+
+  .pyramid{ height: 270px; display:flex; flex-direction:column; justify-content:flex-end; gap:10px; }
+  .layer{
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    padding: 10px 12px;
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease;
+    position:relative; overflow:hidden;
+  }
+  .layer:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+  .layer .meta{
+    font-size: 12px; color: var(--muted); font-weight: 950;
+    display:flex; gap:10px; align-items:center; min-width: 140px; justify-content:flex-end;
+  }
+  .bar{
+    height: 10px; border-radius: 999px;
+    background: linear-gradient(90deg, rgba(124,92,255,1), rgba(46,230,166,1));
+    opacity:.85; width: var(--w);
+    box-shadow: 0 12px 30px rgba(124,92,255,.18);
+  }
+  .hint{ font-size: 12px; color: var(--muted); line-height: 1.45; margin-top: 10px; }
+
+  .nav{
+    position:absolute; left:0; right:0; bottom: 0;
+    padding: 12px 14px;
+    display:flex; justify-content:space-between; align-items:center;
+    border-top: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.03);
+  }
+  .kbd{
+    color: var(--muted);
+    font-size: 12px;
+    display:flex; gap: 10px; align-items:center; flex-wrap:wrap;
+  }
+  .key{
+    padding: 6px 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    font-weight: 950;
+    color: rgba(234,240,255,.92);
+  }
+
+  .overlay{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,.58);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 18px;
+    z-index:120;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    width:min(900px, 100%);
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(17,27,58,.97), rgba(10,16,40,.97));
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 20px 90px rgba(0,0,0,.60);
+    overflow:hidden;
+  }
+  .modalHead{
+    padding: 14px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+  }
+  .modalHead h2{ margin:0; font-size: 14px; letter-spacing:.25px; }
+  .modalBody{
+    padding: 16px;
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 14px;
+  }
+  .modalBody.single{ grid-template-columns: 1fr; }
+  .formula{
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    padding: 12px;
+  }
+  .formula .k{
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 950; letter-spacing:.25px;
+    text-transform: uppercase;
+  }
+  .formula .v{
+    font-size: 14px;
+    font-weight: 950;
+    letter-spacing:.2px;
+    line-height: 1.3;
+  }
+  .closeX{
+    width:38px; height:38px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    cursor:pointer;
+    display:grid; place-items:center;
+    transition: transform .15s ease, background .15s ease;
+    color: rgba(234,240,255,.95);
+    user-select:none;
+    font-weight: 950;
+  }
+  .closeX:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+
+  .toast{
+    position:fixed; left:50%;
+    transform: translateX(-50%);
+    bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.14);
+    color: rgba(234,240,255,.95);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    display:none;
+    z-index:140;
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+    font-weight: 950;
+    letter-spacing:.2px;
+  }
+  .toast.show{ display:block; animation: pop .18s ease; }
+  @keyframes pop{ from{ transform: translateX(-50%) translateY(6px); opacity:.3 } to{ transform: translateX(-50%) translateY(0); opacity:1 } }
+
+  .overview{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,.74);
+    display:none;
+    z-index:130;
+    padding: 92px 18px 18px 18px;
+    overflow:auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .overview.show{ display:block; }
+  .thumbs{
+    max-width: 1220px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .thumb{
+    border-radius: 18px;
+    padding: 14px;
+    cursor:pointer;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    transition: transform .15s ease, background .15s ease;
+  }
+  .thumb:hover{ transform: translateY(-2px); background: rgba(255,255,255,.10); }
+  .thumb .t{ font-weight: 950; }
+  .thumb .d{ color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.35; }
+
+  /* ========= MOBILE SAFARI: SLIDE POR SLIDE + SCROLL DENTRO ========= */
+  @media (max-width: 980px){
+    body{ overflow:hidden; }
+
+    /* stage vira "o scroll container" para iOS */
+    .stage{
+      position: fixed;
+      inset: 76px 0 0 0;
+      padding: 12px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .deck{
+      height: 100%;
+      min-height: calc(100svh - 110px);
+    }
+
+    .viewport{
+      perspective: none;
+    }
+
+    /* 1 slide por vez, com scroll interno */
+    .slide{
+      position: absolute;
+      inset: 0;
+      display: block;
+      grid-template-columns: 1fr;
+      padding: 16px 16px calc(100px + env(safe-area-inset-bottom)) 16px;
+      border-radius: var(--radius2);
+
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+
+      opacity: 0;
+      pointer-events: none;
+
+      /* transição 2D */
+      transform: translateX(14px);
+      transition: transform .28s ease, opacity .22s ease;
+    }
+    .slide.active{
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+    .slide.prev, .slide.next{
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-14px);
+    }
+
+    /* nav "sticky" no fundo do slide */
+    .nav{
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin-top: 14px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .scene{ height: 280px; }
+    .cards{ grid-template-columns: 1fr; }
+    .title{ font-size: 26px; }
+    .brand{ min-width:auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .slide{ transition:none !important; }
+    .logo:before{ animation:none !important; }
+    .p{ animation:none !important; }
+  }
+</style>
+</head>
+
+<body>
+<div class="hud">
+  <div class="brand">
+    <div class="logo" aria-hidden="true"></div>
+    <div>
+      <h1>Cadeia Alimentar & Pirâmides Ecológicas</h1>
+      <div class="sub">Apresentação • clique nas figuras • F = tela cheia</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="pill"><span class="dot"></span><span id="slideCounter">1 / 9</span></div>
+    <button class="btn" id="btnOverview" title="Visão geral (M)">🧭 Visão</button>
+    <button class="btn" id="btnFS" title="Tela cheia (F)">⛶ Tela cheia</button>
+    <button class="btn" id="btnHelp" title="Atalhos (H)">⌨️ Ajuda</button>
+    <button class="btn primary" id="btnStart" title="Início (Home)">▶️ Início</button>
+  </div>
+</div>
+
+<div class="progressWrap"><div class="progress" id="progress"></div></div>
+
+<div class="stage" id="stage">
+  <div class="deck" id="deck">
+    <div class="viewport">
+      <div class="slides3d" id="slides3d">
+
+        <!-- SLIDE 1 -->
+        <section class="slide active single" data-title="Abertura" data-desc="Energia flui, matéria cicla">
+          <div>
+            <h2 class="title">Cadeia Alimentar</h2>
+            <p class="kicker">
+              Cadeia alimentar é a sequência de seres vivos em que um serve de alimento para o outro,
+              transferindo energia e matéria entre níveis tróficos. A energia entra principalmente pelo Sol,
+              passa pelos produtores e segue para consumidores, diminuindo a cada etapa.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Ideias principais</h3>
+              <ul class="list">
+                <li><b>Energia flui</b>: entra no ecossistema e se perde em forma de calor; não volta.</li>
+                <li><b>Matéria cicla</b>: nutrientes retornam ao ambiente por decomposição e são reutilizados.</li>
+                <li><b>Produtores</b> formam a base da cadeia; consumidores ocupam níveis acima.</li>
+              </ul>
+
+              <div class="callouts">
+                <div class="tag">☀️ <b>Energia</b> <span>não recicla</span></div>
+                <div class="tag">🍄 <b>Matéria</b> <span>recicla</span></div>
+                <div class="tag">📉 <b>~10%</b> <span>passa adiante</span></div>
+              </div>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="goTo(1)">
+                <div class="badge">Slide 2</div>
+                <b>Níveis tróficos</b>
+                <div class="small">Produtores, consumidores e decompositores.</div>
+              </div>
+              <div class="card" onclick="goTo(3)">
+                <div class="badge">Slide 4</div>
+                <b>Pirâmides ecológicas</b>
+                <div class="small">Energia x Biomassa.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd">
+                <span class="key">→</span> próximo
+                <span class="key">←</span> voltar
+                <span class="key">F</span> tela cheia
+                <span class="key">M</span> visão
+              </div>
+              <div><button class="btn primary" onclick="next()">Começar ➜</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 2 -->
+        <section class="slide" data-title="Níveis Tróficos" data-desc="Produtores, C1, C2, C3 e decompositores">
+          <div>
+            <h2 class="title">Níveis tróficos</h2>
+            <p class="kicker">
+              Níveis tróficos organizam os seres vivos conforme sua fonte de alimento. A base é formada pelos produtores,
+              e acima aparecem consumidores em diferentes ordens. A decomposição devolve nutrientes ao ambiente.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Estrutura</h3>
+              <ul class="list">
+                <li><b>Produtores</b>: produzem matéria orgânica.</li>
+                <li><b>C1</b>: herbívoros (alimentam-se de produtores).</li>
+                <li><b>C2</b>: alimentam-se de herbívoros.</li>
+                <li><b>C3</b>: predadores de topo em muitas cadeias.</li>
+                <li><b>Decompositores</b>: reciclam matéria orgânica e devolvem nutrientes.</li>
+              </ul>
+            </div>
+
+            <div class="panel" style="margin-top:12px;">
+              <h3>Exemplo numérico</h3>
+              <div class="hint">
+                Produtores: <b>10.000</b> → C1: <b>1.000</b> → C2: <b>100</b> → C3: <b>10</b>.
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">Clique</span> ícones • <span class="key">→</span> energia</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sceneWrap">
+            <div class="scene" id="scene">
+              <svg viewBox="0 0 900 520" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs>
+                  <linearGradient id="gSky" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#0b173b" stop-opacity="1"/>
+                    <stop offset="1" stop-color="#08112a" stop-opacity="1"/>
+                  </linearGradient>
+                  <linearGradient id="gLand" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#1a3b2d" stop-opacity=".9"/>
+                    <stop offset="1" stop-color="#0d231b" stop-opacity=".95"/>
+                  </linearGradient>
+                  <radialGradient id="gSun" cx="30%" cy="30%" r="65%">
+                    <stop offset="0" stop-color="#fff6cf" stop-opacity="1"/>
+                    <stop offset="1" stop-color="#ffcc66" stop-opacity=".95"/>
+                  </radialGradient>
+                </defs>
+
+                <rect x="0" y="0" width="900" height="520" fill="url(#gSky)"/>
+                <g opacity=".35">
+                  <circle cx="70" cy="85" r="2" fill="#fff"/>
+                  <circle cx="140" cy="55" r="1.6" fill="#fff"/>
+                  <circle cx="220" cy="110" r="1.3" fill="#fff"/>
+                  <circle cx="320" cy="70" r="1.2" fill="#fff"/>
+                  <circle cx="590" cy="60" r="1.4" fill="#fff"/>
+                  <circle cx="720" cy="95" r="1.2" fill="#fff"/>
+                  <circle cx="820" cy="70" r="1.6" fill="#fff"/>
+                </g>
+
+                <g>
+                  <circle cx="130" cy="120" r="60" fill="url(#gSun)" opacity=".95"/>
+                  <circle cx="130" cy="120" r="95" fill="#ffcc66" opacity=".08"/>
+                  <circle cx="130" cy="120" r="135" fill="#ffcc66" opacity=".05"/>
+                </g>
+
+                <path d="M0 320 C180 250 260 340 420 300 C560 260 640 340 900 280 L900 520 L0 520 Z"
+                      fill="url(#gLand)" opacity=".92"/>
+              </svg>
+
+              <div class="particles" id="particles"></div>
+
+              <div class="hotspot" style="left:70px; top:78px" onclick="openTopic('sol')">☀️<span class="hsLabel">Sol</span></div>
+              <div class="hotspot" style="left:270px; top:315px" onclick="openTopic('prod')">🌿<span class="hsLabel">Produtores</span></div>
+              <div class="hotspot" style="left:410px; top:330px" onclick="openTopic('c1')">🐛<span class="hsLabel">C1</span></div>
+              <div class="hotspot" style="left:540px; top:320px" onclick="openTopic('c2')">🐸<span class="hsLabel">C2</span></div>
+              <div class="hotspot" style="left:730px; top:140px" onclick="openTopic('c3')">🦅<span class="hsLabel">C3</span></div>
+              <div class="hotspot" style="left:120px; top:380px" onclick="openTopic('dec')">🍄<span class="hsLabel">Decompositores</span></div>
+            </div>
+
+            <div class="panel">
+              <h3>Ideia central</h3>
+              <div class="hint">A energia diminui a cada nível, mas a matéria retorna ao ambiente.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 3 -->
+        <section class="slide" data-title="Fluxo de Energia" data-desc="Regra ~10% e perdas">
+          <div>
+            <h2 class="title">Fluxo de energia</h2>
+            <p class="kicker">
+              Em cada transferência trófica, apenas parte da energia vira biomassa no próximo nível.
+              O restante é usado pelo organismo e perdido como calor, excreções e matéria não assimilada.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Por que diminui?</h3>
+              <ul class="list">
+                <li>Energia é gasta em respiração e manutenção.</li>
+                <li>Nem toda biomassa é consumida; nem tudo é digerido.</li>
+                <li>A eficiência é limitada; por isso cadeias longas são raras.</li>
+              </ul>
+              <div class="callouts">
+                <div class="tag">🔥 <b>Calor</b> <span>perdas</span></div>
+                <div class="tag">📉 <b>~10%</b> <span>média</span></div>
+                <div class="tag">🧠 <b>Limite</b> <span>níveis</span></div>
+              </div>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="openTopic('lei10')">
+                <div class="badge">Clique</div>
+                <b>Regra dos ~10%</b>
+                <div class="small">Exemplo com números.</div>
+              </div>
+              <div class="card" onclick="openTopic('cadeiaLonga')">
+                <div class="badge">Clique</div>
+                <b>Cadeias longas</b>
+                <div class="small">Energia no topo é pequena.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> pirâmide de energia</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Simulação</h3>
+            <div class="pyramid">
+              <div class="layer" style="--w: 92%" onclick="energySim(10000,'Produtores')">
+                <div><b>Produtores</b> 🌿</div>
+                <div class="meta"><span>10.000</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 62%" onclick="energySim(1000,'C1')">
+                <div><b>C1</b> 🐛</div>
+                <div class="meta"><span>1.000</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 38%" onclick="energySim(100,'C2')">
+                <div><b>C2</b> 🐸</div>
+                <div class="meta"><span>100</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 18%" onclick="energySim(10,'C3')">
+                <div><b>C3</b> 🦅</div>
+                <div class="meta"><span>10</span><span class="bar"></span></div>
+              </div>
+            </div>
+            <div class="hint">Clique nas camadas para abrir.</div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4 -->
+        <section class="slide" data-title="Pirâmide de Energia" data-desc="Sempre em pé">
+          <div>
+            <h2 class="title">Pirâmide de Energia</h2>
+            <p class="kicker">
+              A pirâmide de energia mostra a energia disponível em cada nível trófico.
+              Como sempre há perdas, ela é sempre “em pé” e não pode inverter.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Pontos essenciais</h3>
+              <ul class="list">
+                <li>Energia entra pelo Sol e é capturada pelos produtores.</li>
+                <li>Parte é perdida em respiração e calor.</li>
+                <li>O topo nunca tem mais energia que a base.</li>
+              </ul>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> biomassa</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Modelo clicável</h3>
+            <div class="pyramid">
+              <div class="layer" style="--w: 90%" onclick="openModal('Produtores',['Base energética do ecossistema.','Capturam energia primeiro.'],'Energia máxima na base')">
+                <div><b>Produtores</b> 🌿</div><div class="meta"><span>base</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 60%" onclick="openModal('C1',['Recebe parte da energia dos produtores.','Grande parte é perdida no metabolismo.'],'Energia diminui por nível')">
+                <div><b>C1</b> 🐛</div><div class="meta"><span>↓</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 35%" onclick="openModal('C2',['Energia menor que no nível anterior.','Populações ficam mais limitadas.'],'Continua caindo')">
+                <div><b>C2</b> 🐸</div><div class="meta"><span>↓↓</span><span class="bar"></span></div>
+              </div>
+              <div class="layer" style="--w: 18%" onclick="openModal('C3',['Menor energia disponível.','Predadores de topo são menos numerosos.'],'Energia mínima no topo')">
+                <div><b>C3</b> 🦅</div><div class="meta"><span>↓↓↓</span><span class="bar"></span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 5 -->
+        <section class="slide" data-title="Pirâmide de Biomassa" data-desc="Pode inverter no aquático">
+          <div>
+            <h2 class="title">Pirâmide de Biomassa</h2>
+            <p class="kicker">
+              Biomassa é a quantidade de matéria orgânica viva em um momento.
+              Em ambientes aquáticos, a base pode ter baixa biomassa instantânea,
+              mas alta renovação, e por isso a pirâmide pode inverter.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Comparação</h3>
+              <ul class="list">
+                <li><b>Terrestre:</b> produtores geralmente têm mais biomassa.</li>
+                <li><b>Aquático:</b> fitoplâncton renova rápido; biomassa pode inverter.</li>
+                <li>Energia continua diminuindo em qualquer caso.</li>
+              </ul>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="toggleBiomass()">
+                <div class="badge" id="bioBadge">Terrestre</div>
+                <b id="bioTitle">Exemplo: terrestre</b>
+                <div class="small" id="bioText">Produtores acumulam biomassa maior que consumidores.</div>
+              </div>
+              <div class="card" onclick="openTopic('biomassaInverte')">
+                <div class="badge">Clique</div>
+                <b>Inversão no aquático</b>
+                <div class="small">Turnover do fitoplâncton.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> produtividade</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Exemplo aquático</h3>
+            <ul class="list">
+              <li>Fitoplâncton → Zooplâncton → Peixes</li>
+              <li>Baixa biomassa instantânea, alta produção ao longo do tempo.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 6 -->
+        <section class="slide" data-title="Produtividade" data-desc="PPB, respiração e PPL">
+          <div>
+            <h2 class="title">Produtividade: PPB e PPL</h2>
+            <p class="kicker">
+              Produtividade mede quanto de biomassa é produzida por tempo.
+              A produção líquida é a parte que sobra para crescimento e para alimentar a cadeia alimentar.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Fórmula</h3>
+              <div class="panel" style="padding:14px;">
+                <div style="font-weight:950; font-size:20px; letter-spacing:.2px;">PPL = PPB − R</div>
+                <div class="hint">PPB: produção total • R: respiração • PPL: o que sobra</div>
+              </div>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="calcNPP()">
+                <div class="badge">Exemplo</div>
+                <b>Cálculo</b>
+                <div class="small">PPB=200 e R=60 → PPL=140.</div>
+              </div>
+              <div class="card" onclick="openTopic('ppbPpl')">
+                <div class="badge">Clique</div>
+                <b>Interpretação</b>
+                <div class="small">PPL é o que fica disponível na cadeia.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> decompositores</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Ideia central</h3>
+            <div class="hint">Quanto maior a respiração, menor a produção líquida disponível.</div>
+          </div>
+        </section>
+
+        <!-- SLIDE 7 -->
+        <section class="slide" data-title="Decompositores" data-desc="Reciclagem de matéria">
+          <div>
+            <h2 class="title">Decompositores</h2>
+            <p class="kicker">
+              Decompositores quebram matéria orgânica e devolvem nutrientes ao ambiente.
+              Eles atuam sobre detritos, fechando ciclos de matéria e mantendo nutrientes disponíveis.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Decomposição</h3>
+              <ul class="list">
+                <li>Detritos: folhas, fezes, cadáveres e restos orgânicos.</li>
+                <li>Fungos e bactérias transformam em nutrientes simples.</li>
+                <li>Nutrientes retornam ao solo/água e podem ser reutilizados por produtores.</li>
+              </ul>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="openTopic('materiaVsEnergia')">
+                <div class="badge">Clique</div>
+                <b>Energia x Matéria</b>
+                <div class="small">Energia flui; matéria cicla.</div>
+              </div>
+              <div class="card" onclick="openTopic('detritos')">
+                <div class="badge">Clique</div>
+                <b>Detritos</b>
+                <div class="small">O que entra e o que sai do processo.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> quiz</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Frase síntese</h3>
+            <div class="hint"><b>Energia flui; matéria cicla.</b></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 8 -->
+        <section class="slide" data-title="Quiz" data-desc="Revisão rápida">
+          <div>
+            <h2 class="title">Quiz</h2>
+            <p class="kicker">Marque uma alternativa em cada questão e veja o resultado no final.</p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Perguntas</h3>
+
+              <div class="panel" style="padding:14px; margin-top:12px;">
+                <div style="font-weight:950;">1) A pirâmide de energia pode inverter?</div>
+                <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn" onclick="answer('q1','sim')">Sim</button>
+                  <button class="btn" onclick="answer('q1','nao')">Não</button>
+                  <span class="pill" id="q1Badge" style="display:none;"></span>
+                </div>
+              </div>
+
+              <div class="panel" style="padding:14px; margin-top:12px;">
+                <div style="font-weight:950;">2) Complete: PPL = PPB − ____</div>
+                <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn" onclick="answer('q2','resp')">Respiração</button>
+                  <button class="btn" onclick="answer('q2','foto')">Fotossíntese</button>
+                  <button class="btn" onclick="answer('q2','deco')">Decomposição</button>
+                  <span class="pill" id="q2Badge" style="display:none;"></span>
+                </div>
+              </div>
+
+              <div class="panel" style="padding:14px; margin-top:12px;">
+                <div style="font-weight:950;">3) Quem recicla matéria orgânica?</div>
+                <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn" onclick="answer('q3','decomp')">Decompositores</button>
+                  <button class="btn" onclick="answer('q3','topo')">Predadores de topo</button>
+                  <button class="btn" onclick="answer('q3','prod')">Produtores</button>
+                  <span class="pill" id="q3Badge" style="display:none;"></span>
+                </div>
+              </div>
+
+              <div class="panel" style="padding:14px; margin-top:12px;">
+                <button class="btn primary" onclick="finishQuiz()">✅ Ver resultado</button>
+                <button class="btn" onclick="resetQuiz()">↺ Reset</button>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">→</span> resumo final</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="next()">Próximo ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Observação</h3>
+            <div class="hint">Nada fica marcado até alguém clicar.</div>
+          </div>
+        </section>
+
+        <!-- SLIDE 9 -->
+        <section class="slide single" data-title="Resumo Final" data-desc="Fechamento">
+          <div>
+            <h2 class="title">Resumo</h2>
+            <p class="kicker">
+              A energia entra no ecossistema pelo Sol, é capturada por produtores e transferida aos consumidores,
+              diminuindo a cada nível. A pirâmide de energia não inverte por causa das perdas inevitáveis.
+              A biomassa pode inverter em ambientes aquáticos devido à renovação rápida do fitoplâncton.
+              A matéria circula em ciclos, retornando ao ambiente por decompositores e sendo reutilizada por produtores.
+            </p>
+
+            <div class="panel" style="margin-top:16px;">
+              <h3>Frase síntese</h3>
+              <div class="hint"><b>Energia flui; matéria cicla.</b></div>
+            </div>
+
+            <div class="cards">
+              <div class="card" onclick="goTo(0)">
+                <div class="badge">Início</div>
+                <b>Recomeçar</b>
+                <div class="small">Voltar ao primeiro slide.</div>
+              </div>
+              <div class="card" onclick="openOverview()">
+                <div class="badge">Visão</div>
+                <b>Ir para qualquer slide</b>
+                <div class="small">Abrir visão geral e escolher.</div>
+              </div>
+            </div>
+
+            <div class="nav">
+              <div class="kbd"><span class="key">M</span> visão • <span class="key">F</span> tela cheia</div>
+              <div>
+                <button class="btn" onclick="prev()">◀ Voltar</button>
+                <button class="btn primary" onclick="goTo(0)">Encerrar 🏁</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overview" id="overview"><div class="thumbs" id="thumbs"></div></div>
+
+<div class="overlay" id="overlay" onclick="overlayClose(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modalHead">
+      <h2 id="modalTitle">Título</h2>
+      <div class="closeX" onclick="closeModal()" title="Fechar (Esc)">✖</div>
+    </div>
+    <div class="modalBody" id="modalBody">
+      <div><ul class="list" id="modalList"></ul></div>
+      <div class="formula" id="modalFormulaBox">
+        <div class="k">IDEIA / FÓRMULA</div>
+        <div class="v" id="modalFormula">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">—</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  let idx = 0;
+
+  const counterEl = document.getElementById("slideCounter");
+  const progressEl = document.getElementById("progress");
+  const overviewEl = document.getElementById("overview");
+  const thumbsEl = document.getElementById("thumbs");
+  const stage = document.getElementById("stage");
+
+  function isMobile(){ return window.matchMedia("(max-width: 980px)").matches; }
+
+  function renderHUD(){
+    counterEl.textContent = `${idx+1} / ${slides.length}`;
+    const pct = (idx)/(slides.length-1) * 100;
+    progressEl.style.width = `${isFinite(pct)?pct:0}%`;
+  }
+
+  // ✅ no desktop usa prev/next (3D), no mobile o CSS já esconde e vira 2D
+  function apply3DStates(){
+    slides.forEach((s, i)=>{
+      s.classList.remove("active","prev","next");
+      if(i === idx) s.classList.add("active");
+      else if(i === idx - 1) s.classList.add("prev");
+      else if(i === idx + 1) s.classList.add("next");
+    });
+  }
+
+  function resetSlideScroll(){
+    // ✅ no iPhone: garante que o slide atual volta pro topo (sem bug)
+    const active = document.querySelector(".slide.active");
+    if(active) active.scrollTop = 0;
+    if(stage && isMobile()) stage.scrollTop = 0;
+  }
+
+  function show(i){
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    apply3DStates();
+    renderHUD();
+    resetSlideScroll();
+  }
+  function next(){ show(idx+1); }
+  function prev(){ show(idx-1); }
+  function goTo(i){ closeOverview(); show(i); }
+
+  function escapeHtml(s){
+    return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function buildOverview(){
+    thumbsEl.innerHTML = "";
+    slides.forEach((s, i)=>{
+      const t = s.getAttribute("data-title") || `Slide ${i+1}`;
+      const d = s.getAttribute("data-desc") || "";
+      const el = document.createElement("div");
+      el.className = "thumb";
+      el.innerHTML = `<div class="t">${i+1}. ${escapeHtml(t)}</div><div class="d">${escapeHtml(d)}</div>`;
+      el.onclick = ()=> goTo(i);
+      thumbsEl.appendChild(el);
+    });
+  }
+  function openOverview(){ overviewEl.classList.add("show"); }
+  function closeOverview(){ overviewEl.classList.remove("show"); }
+  function toggleOverview(){ overviewEl.classList.toggle("show"); }
+  buildOverview();
+
+  document.getElementById("btnOverview").addEventListener("click", toggleOverview);
+  document.getElementById("btnStart").addEventListener("click", ()=> show(0));
+  document.getElementById("btnHelp").addEventListener("click", ()=>{
+    openModal("Atalhos", ["→ próximo slide","← slide anterior","Home início","M visão geral","F tela cheia","Esc fechar janelas"], "Navegação");
+  });
+
+  async function toggleFullscreen(){
+    try{
+      if(!document.fullscreenElement){
+        await document.documentElement.requestFullscreen?.();
+        showToast("Tela cheia ativada.");
+      }else{
+        await document.exitFullscreen?.();
+        showToast("Tela cheia desativada.");
+      }
+    }catch(e){
+      showToast("Tela cheia não disponível neste navegador.");
+    }
+  }
+  document.getElementById("btnFS").addEventListener("click", toggleFullscreen);
+
+  window.addEventListener("keydown", (e)=>{
+    const key = e.key;
+    if(key === "ArrowRight" || key === "PageDown"){ e.preventDefault(); next(); }
+    if(key === "ArrowLeft"  || key === "PageUp"){ e.preventDefault(); prev(); }
+    if(key === "Home"){ e.preventDefault(); show(0); }
+    if(key.toLowerCase() === "m"){ e.preventDefault(); toggleOverview(); }
+    if(key.toLowerCase() === "f"){ e.preventDefault(); toggleFullscreen(); }
+    if(key.toLowerCase() === "h"){ e.preventDefault(); document.getElementById("btnHelp").click(); }
+    if(key === "Escape"){ closeModal(); closeOverview(); }
+  });
+
+  // Swipe
+  let touchStartX = 0, touchStartY = 0, touchMoved = false;
+  stage.addEventListener("touchstart", (e)=>{
+    if(!e.touches || !e.touches[0]) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchMoved = false;
+  }, {passive:true});
+  stage.addEventListener("touchmove", ()=>{ touchMoved = true; }, {passive:true});
+  stage.addEventListener("touchend", (e)=>{
+    if(!touchMoved) return;
+    const t = e.changedTouches && e.changedTouches[0];
+    if(!t) return;
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if(Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)){
+      if(dx < 0) next(); else prev();
+    }
+  }, {passive:true});
+
+  // Modal
+  const overlay = document.getElementById("overlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalList = document.getElementById("modalList");
+  const modalFormula = document.getElementById("modalFormula");
+  const modalBody = document.getElementById("modalBody");
+  const modalFormulaBox = document.getElementById("modalFormulaBox");
+
+  function openModal(title, list, formula, single=false){
+    modalTitle.textContent = title;
+    modalList.innerHTML = "";
+    (list || []).forEach(t=>{
+      const li = document.createElement("li");
+      li.textContent = t;
+      modalList.appendChild(li);
+    });
+    modalFormula.textContent = formula || "—";
+    modalBody.classList.toggle("single", !!single);
+    modalFormulaBox.style.display = single ? "none" : "block";
+    overlay.classList.add("show");
+  }
+  function closeModal(){ overlay.classList.remove("show"); }
+  function overlayClose(e){ if(e.target === overlay) closeModal(); }
+
+  // Toast
+  const toast = document.getElementById("toast");
+  let toastTimer = null;
+  function showToast(text){
+    toast.textContent = text;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toast.classList.remove("show"), 2200);
+  }
+
+  // Conteúdos (modais)
+  const topics = {
+    sol:{ title:"Sol", text:["A energia do ecossistema começa no Sol.","Produtores transformam luz em energia química.","A energia diminui ao longo da cadeia."], formula:"Sol → Produtores → Consumidores" },
+    prod:{ title:"Produtores", text:["Base da cadeia (plantas, algas, fitoplâncton).","Produzem matéria orgânica.","Sustentam níveis acima."], formula:"Autótrofos = base" },
+    c1:{ title:"C1", text:["Herbívoros que se alimentam de produtores.","Recebem parte da energia da base.","Exemplos variam conforme o ecossistema."], formula:"Produtores → C1" },
+    c2:{ title:"C2", text:["Alimentam-se de herbívoros.","Energia disponível é menor.","Limita populações."], formula:"C1 → C2" },
+    c3:{ title:"C3", text:["Predadores de topo em muitas cadeias.","Menor energia disponível.","População tende a ser menor."], formula:"C2 → C3" },
+    dec:{ title:"Decompositores", text:["Fungos e bactérias.","Reciclam matéria orgânica.","Devolvem nutrientes ao ambiente."], formula:"Detritos → nutrientes" },
+    lei10:{ title:"Regra dos ~10%", text:["Apenas uma fração da energia passa ao próximo nível.","Grande parte é perdida como calor.","Explica por que cadeias longas são raras."], formula:"10.000 → 1.000 → 100 → 10" },
+    cadeiaLonga:{ title:"Cadeias longas", text:["Energia cai rapidamente.","Topo sustenta poucos indivíduos.","Por isso cadeias longas são raras."], formula:"Energia limita níveis" },
+    biomassaInverte:{ title:"Biomassa no aquático", text:["Fitoplâncton tem alta renovação.","Biomassa instantânea pode ser baixa.","Mesmo assim energia diminui."], formula:"Turnover do fitoplâncton" },
+    ppbPpl:{ title:"PPB e PPL", text:["PPB: produção total.","R: respiração.","PPL: o que sobra para a cadeia."], formula:"PPL = PPB − R" },
+    materiaVsEnergia:{ title:"Energia e Matéria", text:["Energia flui e se perde.","Matéria cicla com decompositores."], formula:"Energia flui; matéria cicla" },
+    detritos:{ title:"Detritos", text:["Folhas, fezes, cadáveres.","Decompositores transformam em nutrientes.","Nutrientes retornam aos produtores."], formula:"Detritos → nutrientes → produtores" }
+  };
+
+  function openTopic(key){
+    const t = topics[key];
+    if(!t) return;
+    openModal(t.title, t.text, t.formula);
+  }
+
+  // Partículas (sem erro)
+  const particles = document.getElementById("particles");
+  function spawnParticles(){
+    if(!particles) return;
+    const points = [
+      {x: 120, y: 95, dx: 170, dy: 210},
+      {x: 300, y: 330, dx: 120, dy: 10},
+      {x: 430, y: 350, dx: 120, dy: -10},
+      {x: 560, y: 340, dx: 150, dy: -190},
+    ];
+    for(let i=0;i<10;i++){
+      const pick = points[i % points.length];
+      const dot = document.createElement("div");
+      dot.className = "p";
+      const jitter = (n)=> (Math.random()*n - n/2);
+      dot.style.left = (pick.x + jitter(30)) + "px";
+      dot.style.top  = (pick.y + jitter(30)) + "px";
+      dot.style.setProperty("--dx", (pick.dx + jitter(40)) + "px");
+      dot.style.setProperty("--dy", (pick.dy + jitter(40)) + "px");
+      dot.style.animationDuration = (3 + Math.random()*2.3) + "s";
+      dot.style.animationDelay = (Math.random()*1.8) + "s";
+      particles.appendChild(dot);
+      setTimeout(()=> dot.remove(), 6500);
+    }
+  }
+  setInterval(spawnParticles, 2200);
+  spawnParticles();
+
+  function energySim(value, level){
+    openModal("Energia disponível", [`Nível: ${level}`, `Valor ilustrativo: ~${value} unidades`, "A energia diminui ao subir na cadeia."], "Transferência baixa");
+  }
+
+  let biomassMode = "ter";
+  function toggleBiomass(){
+    const badge = document.getElementById("bioBadge");
+    const title = document.getElementById("bioTitle");
+    const text  = document.getElementById("bioText");
+    biomassMode = (biomassMode === "ter") ? "aq" : "ter";
+    if(biomassMode === "ter"){
+      badge.textContent = "Terrestre";
+      title.textContent = "Exemplo: terrestre";
+      text.textContent  = "Produtores acumulam biomassa maior que consumidores.";
+    }else{
+      badge.textContent = "Aquático";
+      title.textContent = "Exemplo: aquático";
+      text.textContent  = "Fitoplâncton renova rápido; biomassa pode inverter no instante.";
+    }
+  }
+
+  function calcNPP(){
+    openModal("Cálculo", ["PPB = 200", "R = 60", "PPL = PPB − R = 140"], "PPL = PPB − R");
+  }
+
+  // Quiz
+  const quiz = { q1:null, q2:null, q3:null };
+  const correct = { q1:"nao", q2:"resp", q3:"decomp" };
+
+  function answer(q, val){
+    quiz[q] = val;
+    const badge = document.getElementById(q + "Badge");
+    badge.style.display = "inline-flex";
+    badge.innerHTML = `<span class="dot" style="background:rgba(234,240,255,.8); box-shadow:0 0 0 6px rgba(234,240,255,.08)"></span> Selecionado`;
+  }
+
+  function finishQuiz(){
+    const keys = Object.keys(quiz);
+    const answered = keys.filter(k => quiz[k] !== null).length;
+    if(answered < 3){
+      showToast("Responda todas as questões.");
+      return;
+    }
+    let score = 0;
+    keys.forEach(k => { if(quiz[k] === correct[k]) score++; });
+
+    openModal("Resultado",
+      [
+        `Acertos: ${score} de 3.`,
+        "• Pirâmide de energia não inverte.",
+        "• PPL = PPB − R.",
+        "• Decompositores reciclam matéria orgânica."
+      ],
+      "Energia flui; matéria cicla",
+      true
+    );
+  }
+
+  function resetQuiz(){
+    quiz.q1 = quiz.q2 = quiz.q3 = null;
+    ["q1","q2","q3"].forEach(q=>{
+      const badge = document.getElementById(q + "Badge");
+      badge.style.display = "none";
+      badge.textContent = "";
+    });
+    showToast("Quiz resetado.");
+  }
+
+  // Overview click-out
+  overviewEl.addEventListener("click", (e)=>{ if(e.target === overviewEl) closeOverview(); });
+
+  // Resize/rotate
+  window.addEventListener("resize", ()=>{
+    apply3DStates();
+    renderHUD();
+    resetSlideScroll();
+  });
+
+  // Expose
+  window.next = next; window.prev = prev; window.goTo = goTo;
+  window.openOverview = openOverview; window.openTopic = openTopic;
+  window.energySim = energySim; window.toggleBiomass = toggleBiomass;
+  window.calcNPP = calcNPP; window.answer = answer; window.finishQuiz = finishQuiz; window.resetQuiz = resetQuiz;
+  window.closeModal = closeModal;
+
+  // Init
+  renderHUD(); apply3DStates(); show(0);
+</script>
+</body>
+</html>
